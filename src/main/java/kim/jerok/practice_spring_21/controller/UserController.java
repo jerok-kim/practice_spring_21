@@ -61,7 +61,7 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserRequest.LoginDto loginDto, HttpServletRequest request) {
         Optional<User> userOP = userRepository.findByUsernameAndPassword(loginDto.getUsername(), loginDto.getPassword());
-        
+
         // 로그인 되었다는 뜻
         if (userOP.isPresent()) {
             // 1. 유저 정보 꺼내기
