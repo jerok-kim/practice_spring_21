@@ -17,6 +17,7 @@ public class JwtProvider {
     public static final String HEADER = "Authorization";
     private static final String SECRET = "Rustacean";
 
+    // 로그인 완료시
     public static String create(User user) {
         String jwt = JWT.create()
                 .withSubject(SUBJECT)
@@ -27,6 +28,7 @@ public class JwtProvider {
         return TOKEN_PREFIX + jwt;
     }
 
+    // 인증이 필요한 리소스 접근시
     public static DecodedJWT verify(String jwt) throws SignatureVerificationException, TokenExpiredException {
         DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC512(SECRET))
                 .build().verify(jwt);

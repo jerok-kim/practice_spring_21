@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 public class PracticeSpring21Application {
 
+    // 서버 실행시에 실행됨!!
     @Bean
     CommandLineRunner initDatabase(UserRepository userRepository) {
         return (args) -> {

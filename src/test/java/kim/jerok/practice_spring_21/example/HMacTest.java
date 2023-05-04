@@ -10,14 +10,15 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 public class HMacTest {
-
+    
     @Test
     public void hmac_test() {
-        String message = "Your message to be hashed";
-        String secretKey = "Your secret key";
+        String message = "Study Hard";
+        String secretKey = "jerok";
 
         try {
             String hashedMessage = hmacSha512(message, secretKey);
+            System.out.println("HMAC-SHA512 Hashed Message: " + hashedMessage);
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             e.printStackTrace();
         }

@@ -21,21 +21,33 @@ public class JwtVerifyFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         System.out.println("디버그 : JwtVerifyFilter 동작합");
+
+        // 1. 다운캐스팅
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
+
+        // 2. 헤더 검증
         String prefixJwt = req.getHeader(JwtProvider.HEADER);
         if (prefixJwt == null) {
             error(resp, new Exception400("토큰이 전달되지 않았습니다"));
             return;
         }
+
+        // 3. Bearer 제거
         String jwt = prefixJwt.replace(JwtProvider.TOKEN_PREFIX, "");
+
         try {
+            // 4. 검증
             DecodedJWT decodedJWT = JwtProvider.verify(jwt);
             int id = decodedJWT.getClaim("id").asInt();
             String role = decodedJWT.getClaim("role").asString();
 
+            // 5. 세션생성 - 세션값으로 권한처리하기 위해
             HttpSession session = req.getSession();
             LoginUser loginUser = LoginUser.builder().id(id).role(role).build();
+            session.setAttribute("loginUser", loginUser);
+            
+            // 6. 다음 필터로 가! -> DS로!
             chain.doFilter(req, resp);
         } catch (SignatureVerificationException sve) {
             error(resp, sve);
@@ -44,6 +56,7 @@ public class JwtVerifyFilter implements Filter {
         }
     }
 
+    // 필터 예외는 Exception 핸들러에서 처리하지 못한다
     public void error(HttpServletResponse resp, Exception e) throws IOException {
         resp.setStatus(401);
         resp.setContentType("application/json; charset=utf-8");

@@ -12,6 +12,7 @@ import kim.jerok.practice_spring_21.model.user.User;
 import kim.jerok.practice_spring_21.model.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -56,15 +57,18 @@ public class UserController {
         }
     }
 
+    @Transactional  // 트랜잭션 종료시에 em.flush() 가 발동 됨
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserRequest.LoginDto loginDto, HttpServletRequest request) {
         Optional<User> userOP = userRepository.findByUsernameAndPassword(loginDto.getUsername(), loginDto.getPassword());
+        
+        // 로그인 되었다는 뜻
         if (userOP.isPresent()) {
             // 1. 유저 정보 꺼내기
             User loginUser = userOP.get();
 
             // 2. JWT 생성하기
-            String jwt = JwtProvider.create(userOP.get());
+            String jwt = JwtProvider.create(loginUser);
 
             // 3. 최종 로그인 날짜 기록 (더티체킹 - update 쿼리 발생)
             loginUser.setUpdatedAt(LocalDateTime.now());
